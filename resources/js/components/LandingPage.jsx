@@ -16,12 +16,20 @@ function LandingPage({ onNavigate }) {
                                 <p className="text-xs text-gray-500">Coaching Center</p>
                             </div>
                         </div>
-                        <button
-                            onClick={() => onNavigate('login')}
-                            className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
-                        >
-                            Staff Login
-                        </button>
+                        <div className="flex items-center space-x-4">
+                            <button
+                                onClick={() => onNavigate('register')}
+                                className="bg-white text-indigo-600 px-4 py-2 rounded-lg hover:bg-gray-100 transition-colors border border-indigo-600"
+                            >
+                                Register
+                            </button>
+                            <button
+                                onClick={() => onNavigate('login')}
+                                className="bg-indigo-600 text-white px-4 py-2 rounded-lg hover:bg-indigo-700 transition-colors"
+                            >
+                                Login
+                            </button>
+                        </div>
                     </div>
                 </div>
             </header>
@@ -61,7 +69,7 @@ function LandingPage({ onNavigate }) {
                 </div>
 
                 {/* Main Actions */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <div className="max-w-2xl mx-auto mb-12">
                     {/* Student Application */}
                     <div className="bg-white rounded-lg shadow-lg p-8">
                         <div className="text-center mb-6">
@@ -70,7 +78,8 @@ function LandingPage({ onNavigate }) {
                                 Apply for Admission
                             </h3>
                             <p className="text-gray-600">
-                                Join our coaching center and excel in your studies with expert guidance.
+                                Join our coaching center and excel in your studies with expert guidance. 
+                                Register as a student or guardian to get started.
                             </p>
                         </div>
                         <button
@@ -78,25 +87,6 @@ function LandingPage({ onNavigate }) {
                             className="w-full bg-indigo-600 text-white py-3 px-6 rounded-lg hover:bg-indigo-700 transition-colors font-medium"
                         >
                             Apply Now
-                        </button>
-                    </div>
-
-                    {/* Parent Portal */}
-                    <div className="bg-white rounded-lg shadow-lg p-8">
-                        <div className="text-center mb-6">
-                            <div className="text-6xl mb-4">👨‍👩‍👧‍👦</div>
-                            <h3 className="text-2xl font-bold text-gray-900 mb-2">
-                                Parent Portal
-                            </h3>
-                            <p className="text-gray-600">
-                                Track your child's progress, attendance, and payments online.
-                            </p>
-                        </div>
-                        <button
-                            onClick={() => onNavigate('parent-login')}
-                            className="w-full bg-green-600 text-white py-3 px-6 rounded-lg hover:bg-green-700 transition-colors font-medium"
-                        >
-                            Parent Login
                         </button>
                     </div>
                 </div>

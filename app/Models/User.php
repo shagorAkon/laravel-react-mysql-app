@@ -23,7 +23,11 @@ class User extends Authenticatable
         'password',
         'role_id',
         'phone',
-        'is_active'
+        'is_active',
+        'approval_status',
+        'approved_by',
+        'approved_at',
+        'rejection_reason'
     ];
 
     /**
@@ -43,12 +47,18 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
-        'is_active' => 'boolean'
+        'is_active' => 'boolean',
+        'approved_at' => 'datetime'
     ];
 
     public function role()
     {
         return $this->belongsTo(Role::class);
+    }
+
+    public function approver()
+    {
+        return $this->belongsTo(User::class, 'approved_by');
     }
 
     public function hasRole($roleName)
@@ -69,5 +79,20 @@ class User extends Authenticatable
     public function isAdmin()
     {
         return $this->hasRole('admin') || $this->isSuperAdmin();
+    }
+
+    public function isApproved()
+    {
+        return $this->approval_status === 'approved';
+    }
+
+    public function isPending()
+    {
+        return $this->approval_status === 'pending';
+    }
+
+    public function isRejected()
+    {
+        return $this->approval_status === 'rejected';
     }
 }

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import LandingPage from './LandingPage';
 import LoginForm from './LoginForm';
-import StudentApplicationForm from './StudentApplicationForm';
+import RegisterForm from './RegisterForm';
+import ApplyNow from './ApplyNow';
 import Dashboard from './Dashboard';
 
 // Set up axios defaults
@@ -14,7 +15,7 @@ function App() {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
     const [token, setToken] = useState(localStorage.getItem('auth_token'));
-    const [currentView, setCurrentView] = useState('landing'); // landing, login, apply, parent-login
+    const [currentView, setCurrentView] = useState('landing'); // landing, login, register, apply, dashboard
 
     useEffect(() => {
         if (token) {
@@ -75,10 +76,10 @@ function App() {
             return <LandingPage onNavigate={navigate} />;
         case 'login':
             return <LoginForm onLogin={login} onBack={() => navigate('landing')} />;
+        case 'register':
+            return <RegisterForm onBack={() => navigate('landing')} onSuccess={() => navigate('landing')} />;
         case 'apply':
-            return <StudentApplicationForm onBack={() => navigate('landing')} />;
-        case 'parent-login':
-            return <LoginForm onLogin={login} onBack={() => navigate('landing')} isParent={true} />;
+            return <ApplyNow onBack={() => navigate('landing')} />;
         case 'dashboard':
             return user ? <Dashboard user={user} onLogout={logout} /> : <LandingPage onNavigate={navigate} />;
         default:

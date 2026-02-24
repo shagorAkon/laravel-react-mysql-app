@@ -6,6 +6,8 @@ use App\Http\Controllers\Api\UserController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\StudentController;
 use App\Http\Controllers\Api\DashboardController;
+use App\Http\Controllers\Api\ApplicationController;
+use App\Http\Controllers\Api\UserApprovalController;
 
 /*
 |--------------------------------------------------------------------------
@@ -29,7 +31,8 @@ Route::get('/test', function () {
 
 // Public routes
 Route::post('/login', [AuthController::class, 'login']);
-Route::post('/student-application', [StudentController::class, 'store']);
+Route::post('/register', [AuthController::class, 'register']);
+Route::post('/applications', [ApplicationController::class, 'store']);
 
 // Protected routes
 Route::middleware('auth:sanctum')->group(function () {
@@ -41,6 +44,17 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/dashboard/stats', [DashboardController::class, 'stats']);
     Route::get('/dashboard/student', [DashboardController::class, 'studentDashboard']);
     Route::get('/dashboard/parent', [DashboardController::class, 'parentDashboard']);
+    
+    // Application management routes (Admin/Super Admin only)
+    Route::apiResource('applications', ApplicationController::class)->except(['store']);
+    Route::post('/applications/{application}/approve', [ApplicationController::class, 'approve']);
+    Route::post('/applications/{application}/reject', [ApplicationController::class, 'reject']);
+    
+    // User approval routes (Super Admin only)
+    Route::get('/users/pending', [UserApprovalController::class, 'pendingUsers']);
+    Route::post('/users/{user}/approve', [UserApprovalController::class, 'approve']);
+    Route::post('/users/{user}/reject', [UserApprovalController::class, 'reject']);
+    Route::post('/users/{user}/assign-role', [UserApprovalController::class, 'assignRole']);
     
     // Student management routes
     Route::apiResource('students', StudentController::class);

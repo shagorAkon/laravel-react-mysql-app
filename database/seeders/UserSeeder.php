@@ -22,6 +22,7 @@ class UserSeeder extends Seeder
             'role_id' => $superAdminRole->id,
             'phone' => '+8801700000000',
             'is_active' => true,
+            'approval_status' => 'approved',
             'email_verified_at' => now()
         ]);
 
@@ -33,6 +34,7 @@ class UserSeeder extends Seeder
             'role_id' => $adminRole->id,
             'phone' => '+8801700000001',
             'is_active' => true,
+            'approval_status' => 'approved',
             'email_verified_at' => now()
         ]);
     }

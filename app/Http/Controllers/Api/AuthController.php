@@ -27,6 +27,18 @@ class AuthController extends Controller
             ]);
         }
 
+        // Check if user is approved
+        if (!$user->isApproved()) {
+            $message = 'Your account is pending approval.';
+            if ($user->isRejected()) {
+                $message = 'Your account has been rejected. ' . ($user->rejection_reason ?? 'Please contact administrator for more information.');
+            }
+            return response()->json([
+                'message' => $message,
+                'status' => $user->approval_status
+            ], 403);
+        }
+
         if (!$user->is_active) {
             return response()->json([
                 'message' => 'Your account is inactive. Please contact administrator.'
@@ -40,6 +52,30 @@ class AuthController extends Controller
             'token' => $token,
             'message' => 'Login successful'
         ]);
+    }
+
+    public function register(Request $request): JsonResponse
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users',
+            'password' => 'required|string|min:8|confirmed',
+            'phone' => 'required|string|max:20',
+        ]);
+
+        $user = User::create([
+            'name' => $request->name,
+            'email' => $request->email,
+            'password' => Hash::make($request->password),
+            'phone' => $request->phone,
+            'approval_status' => 'pending',
+            'is_active' => false
+        ]);
+
+        return response()->json([
+            'message' => 'Registration successful! Your account is pending approval. You will be notified once approved.',
+            'user' => $user
+        ], 201);
     }
 
     public function logout(Request $request): JsonResponse
