@@ -1,86 +1,89 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import LandingPage from './LandingPage';
+import LoginForm from './LoginForm';
+import StudentApplicationForm from './StudentApplicationForm';
+import Dashboard from './Dashboard';
+
+// Set up axios defaults
+axios.defaults.baseURL = '/api';
+axios.defaults.headers.common['Accept'] = 'application/json';
+axios.defaults.headers.common['Content-Type'] = 'application/json';
 
 function App() {
-    const [message, setMessage] = useState('Loading...');
-    const [users, setUsers] = useState([]);
+    const [user, setUser] = useState(null);
+    const [loading, setLoading] = useState(true);
+    const [token, setToken] = useState(localStorage.getItem('auth_token'));
+    const [currentView, setCurrentView] = useState('landing'); // landing, login, apply, parent-login
 
     useEffect(() => {
-        // Test API call to Laravel backend
-        axios.get('/api/test')
-            .then(response => {
-                setMessage(response.data.message);
-            })
-            .catch(error => {
-                setMessage('Welcome to Laravel + React!');
-            });
+        if (token) {
+            axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+            fetchUser();
+        } else {
+            setLoading(false);
+        }
+    }, [token]);
 
-        // Fetch users (example)
-        axios.get('/api/users')
-            .then(response => {
-                setUsers(response.data);
-            })
-            .catch(error => {
-                console.log('Users endpoint not ready yet');
-            });
-    }, []);
+    const fetchUser = async () => {
+        try {
+            const response = await axios.get('/me');
+            setUser(response.data.user);
+            setCurrentView('dashboard');
+        } catch (error) {
+            console.error('Failed to fetch user:', error);
+            logout();
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    return (
-        <div className="container mx-auto px-4 py-8">
-            <div className="max-w-4xl mx-auto">
-                <header className="text-center mb-8">
-                    <h1 className="text-4xl font-bold text-gray-800 mb-4">
-                        Laravel + React Application
-                    </h1>
-                    <p className="text-lg text-gray-600">{message}</p>
-                </header>
+    const login = (userData, authToken) => {
+        setUser(userData);
+        setToken(authToken);
+        localStorage.setItem('auth_token', authToken);
+        axios.defaults.headers.common['Authorization'] = `Bearer ${authToken}`;
+        setCurrentView('dashboard');
+    };
 
-                <div className="grid md:grid-cols-2 gap-8">
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                        <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-                            Frontend Features
-                        </h2>
-                        <ul className="space-y-2 text-gray-600">
-                            <li>✅ React 19 with Hooks</li>
-                            <li>✅ Laravel Mix for bundling</li>
-                            <li>✅ Axios for API calls</li>
-                            <li>✅ Tailwind CSS ready</li>
-                            <li>✅ Component-based architecture</li>
-                        </ul>
-                    </div>
+    const logout = () => {
+        setUser(null);
+        setToken(null);
+        localStorage.removeItem('auth_token');
+        delete axios.defaults.headers.common['Authorization'];
+        setCurrentView('landing');
+    };
 
-                    <div className="bg-white rounded-lg shadow-md p-6">
-                        <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-                            Backend Features
-                        </h2>
-                        <ul className="space-y-2 text-gray-600">
-                            <li>✅ Laravel 8 Framework</li>
-                            <li>✅ MySQL Database</li>
-                            <li>✅ RESTful API endpoints</li>
-                            <li>✅ Authentication ready</li>
-                            <li>✅ Migration system</li>
-                        </ul>
-                    </div>
+    const navigate = (view) => {
+        setCurrentView(view);
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+                <div className="text-center">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+                    <p className="mt-4 text-gray-600">Loading...</p>
                 </div>
-
-                {users.length > 0 && (
-                    <div className="mt-8 bg-white rounded-lg shadow-md p-6">
-                        <h2 className="text-2xl font-semibold mb-4 text-gray-800">
-                            Users from Database
-                        </h2>
-                        <div className="grid gap-4">
-                            {users.map(user => (
-                                <div key={user.id} className="border-l-4 border-blue-500 pl-4">
-                                    <h3 className="font-semibold">{user.name}</h3>
-                                    <p className="text-gray-600">{user.email}</p>
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                )}
             </div>
-        </div>
-    );
+        );
+    }
+
+    // Render based on current view
+    switch (currentView) {
+        case 'landing':
+            return <LandingPage onNavigate={navigate} />;
+        case 'login':
+            return <LoginForm onLogin={login} onBack={() => navigate('landing')} />;
+        case 'apply':
+            return <StudentApplicationForm onBack={() => navigate('landing')} />;
+        case 'parent-login':
+            return <LoginForm onLogin={login} onBack={() => navigate('landing')} isParent={true} />;
+        case 'dashboard':
+            return user ? <Dashboard user={user} onLogout={logout} /> : <LandingPage onNavigate={navigate} />;
+        default:
+            return <LandingPage onNavigate={navigate} />;
+    }
 }
 
 export default App;

@@ -4,32 +4,36 @@ namespace Database\Seeders;
 
 use Illuminate\Database\Seeder;
 use App\Models\User;
+use App\Models\Role;
+use Illuminate\Support\Facades\Hash;
 
 class UserSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     *
-     * @return void
-     */
     public function run()
     {
+        $superAdminRole = Role::where('name', 'super_admin')->first();
+        $adminRole = Role::where('name', 'admin')->first();
+
+        // Create Super Admin (Rs Rana Sohel - Owner)
         User::create([
-            'name' => 'John Doe',
-            'email' => 'john@example.com',
-            'password' => bcrypt('password'),
+            'name' => 'Rs Rana Sohel',
+            'email' => 'rana@knowwithrana.com',
+            'password' => Hash::make('password123'),
+            'role_id' => $superAdminRole->id,
+            'phone' => '+8801700000000',
+            'is_active' => true,
+            'email_verified_at' => now()
         ]);
 
+        // Create Admin Users
         User::create([
-            'name' => 'Jane Smith',
-            'email' => 'jane@example.com',
-            'password' => bcrypt('password'),
-        ]);
-
-        User::create([
-            'name' => 'Bob Johnson',
-            'email' => 'bob@example.com',
-            'password' => bcrypt('password'),
+            'name' => 'Admin User',
+            'email' => 'admin@knowwithrana.com',
+            'password' => Hash::make('admin123'),
+            'role_id' => $adminRole->id,
+            'phone' => '+8801700000001',
+            'is_active' => true,
+            'email_verified_at' => now()
         ]);
     }
 }
